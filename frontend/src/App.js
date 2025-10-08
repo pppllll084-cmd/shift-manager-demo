@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Login from "./components/Login";
-import AvailabilityForm from "./components/AvailabilityForm";
+import { AvailabilityForm } from './components/AvailabilityForm';
 
 function App() {
   const [user, setUser] = useState(null);
