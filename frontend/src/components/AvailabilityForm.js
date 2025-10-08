@@ -1,5 +1,7 @@
-function AvailabilityForm({ user }) {
-  const API_URL = "https://shift-manager-demo.onrender.com"; // שנה לכתובת שלך
+import React, { useState, useEffect } from "react";
+
+export function AvailabilityForm({ user }) {
+  const API_URL = "https://shift-manager-demo.onrender.com"; // שנה לכתובת שלך אם צריך
   const [availabilities, setAvailabilities] = useState([]);
   const [date, setDate] = useState("");
   const [available, setAvailable] = useState(false);
@@ -19,21 +21,29 @@ function AvailabilityForm({ user }) {
     setAvailabilities(data);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div>
       <h3>הזמינות שלך</h3>
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
       <label>
-        <input type="checkbox" checked={available} onChange={(e) => setAvailable(e.target.checked)} />
+        <input
+          type="checkbox"
+          checked={available}
+          onChange={(e) => setAvailable(e.target.checked)}
+        />
         זמין ביום זה
       </label>
       <button onClick={submitAvailability}>שמור</button>
 
       <ul>
         {availabilities.map((a, i) => (
-          <li key={i}>{a.username} - {a.date} : {a.available ? "✅" : "❌"}</li>
+          <li key={i}>
+            {a.username} - {a.date} : {a.available ? "✅" : "❌"}
+          </li>
         ))}
       </ul>
     </div>
