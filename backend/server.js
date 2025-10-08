@@ -1,62 +1,35 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const app = express();
+const port = process.env.PORT || 5000;
+
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-// MongoDB Atlas
-mongoose.connect(
-  "mongodb+srv://<username>:<password>@cluster0.mongodb.net/shift_manager?retryWrites=true&w=majority",
-  { useNewUrlParser: true, useUnifiedTopology: true }
-);
+// שמירת זמינות בעזרת משתנה בזיכרון
+let availabilityData = [];
 
-// Schemas
-const userSchema = new mongoose.Schema({
-  username: String,
-  role: { type: String, enum: ["employee", "manager"], default: "employee" }
-});
-const User = mongoose.model("User", userSchema);
+// נתיב לשליחת זמינות
+app.post("/availability", (req, res) => {
+  const { employee, status } = req.body;
+  const existingIndex = availabilityData.findIndex(e => e.employee === employee);
 
-const availabilitySchema = new mongoose.Schema({
-  employee: String,
-  day: String,
-  hours: [String]
-});
-const Availability = mongoose.model("Availability", availabilitySchema);
-
-// Seed users for demo
-const usersDemo = [
-  { username: "shalev", role: "employee" },
-  { username: "ariel", role: "employee" },
-  { username: "ori", role: "employee" },
-  { username: "roaa", role: "employee" },
-  { username: "manager", role: "manager" }
-];
-
-usersDemo.forEach(async (u) => {
-  const exists = await User.findOne({ username: u.username });
-  if (!exists) await new User(u).save();
-});
-
-// Routes
-app.get("/availability/:requester/:role", async (req, res) => {
-  const { requester, role } = req.params;
-  if (role === "manager") {
-    const data = await Availability.find();
-    res.json(data);
+  if (existingIndex >= 0) {
+    availabilityData[existingIndex].status = status;
   } else {
-    const data = await Availability.find({ employee: requester });
-    res.json(data);
+    availabilityData.push({ employee, status });
   }
+
+  res.json({ success: true, data: availabilityData });
 });
 
-app.post("/availability", async (req, res) => {
-  const { employee, day, hours } = req.body;
-  const entry = new Availability({ employee, day, hours });
-  await entry.save();
-  res.json({ status: "ok" });
+// נתיב לשליפת זמינות
+app.get("/availability", (req, res) => {
+  res.json(availabilityData);
 });
 
-app.listen(5000, () => console.log("Backend running on port 5000"));
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
