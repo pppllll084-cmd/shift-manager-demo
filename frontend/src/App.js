@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Login from "./components/Login";
 import AvailabilityForm from "./components/AvailabilityForm";
-import AvailabilityList from "./components/AvailabilityList";
 
 function App() {
-  const [availabilityData, setAvailabilityData] = useState([]);
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    fetch("http://127.0.0.1:5000/availability") // או כאן כתובת Render
-      .then(res => res.json())
-      .then(data => setAvailabilityData(data))
-      .catch(err => console.log("שגיאה בשרת:", err));
-  }, []);
+  if (!user) return <Login onLogin={setUser} />;
 
   return (
-    <div style={{ padding: "20px", direction: "rtl", fontFamily: "Arial" }}>
-      <h1>Shift Manager Demo</h1>
-      <AvailabilityForm availabilityData={availabilityData} setAvailabilityData={setAvailabilityData} />
-      <AvailabilityList availabilityData={availabilityData} />
+    <div>
+      <h1>מערכת ניהול משמרות</h1>
+      <h2>שלום {user.username} ({user.role})</h2>
+      <AvailabilityForm user={user} />
     </div>
   );
 }
