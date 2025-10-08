@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 export function AvailabilityForm({ user }) {
-  const API_URL = "https://shift-manager-demo.onrender.com"; // שנה לכתובת שלך אם צריך
+  const API_URL = "https://shift-manager-demo-2.onrender.com"; // שנה לכתובת שלך אם צריך
   const [availabilities, setAvailabilities] = useState([]);
   const [date, setDate] = useState("");
   const [available, setAvailable] = useState(false);
