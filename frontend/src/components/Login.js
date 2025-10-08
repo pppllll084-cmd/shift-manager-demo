@@ -3,7 +3,7 @@ import React, { useState } from "react";
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const API_URL = "https://shift-manager-demo.onrender.com"; // שנה ל-URL שלך
+  const API_URL = "https://shift-manager-demo-2.onrender.com"; // שנה ל-URL שלך
 
   const handleSubmit = async (e) => {
     e.preventDefault();
