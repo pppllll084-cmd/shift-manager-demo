@@ -1,35 +1,73 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 
 const app = express();
-const port = process.env.PORT || 5000;
-
+app.use(express.json());
 app.use(cors());
-app.use(bodyParser.json());
 
-// שמירת זמינות בעזרת משתנה בזיכרון
-let availabilityData = [];
+mongoose.connect("mongodb+srv://<YOUR_MONGODB_URL>", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-// נתיב לשליחת זמינות
-app.post("/availability", (req, res) => {
-  const { employee, status } = req.body;
-  const existingIndex = availabilityData.findIndex(e => e.employee === employee);
+// סכמת משתמשים
+const userSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+  role: String, // "employee" או "manager"
+});
 
-  if (existingIndex >= 0) {
-    availabilityData[existingIndex].status = status;
+// סכמת זמינות
+const availabilitySchema = new mongoose.Schema({
+  username: String,
+  date: String,
+  available: Boolean,
+});
+
+const User = mongoose.model("User", userSchema);
+const Availability = mongoose.model("Availability", availabilitySchema);
+
+// 🔹 רישום משתמשים (רק לפעם הראשונה)
+app.post("/register", async (req, res) => {
+  const { username, password, role } = req.body;
+  const user = new User({ username, password, role });
+  await user.save();
+  res.send("User registered");
+});
+
+// 🔹 התחברות
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ username, password });
+  if (!user) return res.status(401).send("Invalid credentials");
+  res.json({ username: user.username, role: user.role });
+});
+
+// 🔹 שמירת זמינות
+app.post("/availability", async (req, res) => {
+  const { username, date, available } = req.body;
+  const existing = await Availability.findOne({ username, date });
+  if (existing) {
+    existing.available = available;
+    await existing.save();
   } else {
-    availabilityData.push({ employee, status });
+    await new Availability({ username, date, available }).save();
   }
-
-  res.json({ success: true, data: availabilityData });
+  res.send("Saved");
 });
 
-// נתיב לשליפת זמינות
-app.get("/availability", (req, res) => {
-  res.json(availabilityData);
+// 🔹 צפייה בזמינות
+app.get("/availability", async (req, res) => {
+  const { username, role } = req.query;
+
+  if (role === "manager") {
+    const all = await Availability.find();
+    res.json(all);
+  } else {
+    const userData = await Availability.find({ username });
+    res.json(userData);
+  }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+app.listen(5000, () => console.log("Server running on port 5000"));
