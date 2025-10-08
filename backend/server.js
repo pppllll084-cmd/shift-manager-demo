@@ -6,10 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect("mongodb+srv://<YOUR_MONGODB_URL>", {
+mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 
 // סכמת משתמשים
 const userSchema = new mongoose.Schema({
