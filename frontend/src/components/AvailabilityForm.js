@@ -1,5 +1,5 @@
 function AvailabilityForm({ user }) {
-  const API_URL = "https://shift-manager-backend.onrender.com"; // שנה לכתובת שלך
+  const API_URL = "https://shift-manager-demo.onrender.com"; // שנה לכתובת שלך
   const [availabilities, setAvailabilities] = useState([]);
   const [date, setDate] = useState("");
   const [available, setAvailable] = useState(false);
